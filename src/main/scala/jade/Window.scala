@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFW.{GLFW_FALSE, GLFW_KEY_SPACE, GLFW_MAXIMIZED, GLFW_RES
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, glClear, glClearColor}
+import util.Time
 
 object Window {
   val width = 720
@@ -13,6 +14,20 @@ object Window {
   val title = "Mario"
 
   var glfwWindow: Option[java.lang.Long] = None
+
+  var currentScene: Scene = new LevelEditorScene()
+
+  var r: Float = 1
+  var g: Float = 1
+  var b: Float = 1
+  private var a: Float = 1
+  private var fadeToBlack = false
+
+  def changeScene(newScene: Int): Unit = newScene match {
+    case 0 => currentScene = new LevelEditorScene()
+    case 1 => currentScene = new LevelScene()
+    case _ => assert(assertion = false, s"Unknown scene '$newScene'")
+  }
 
   def run(): Unit = {
     println(s"Hello LWJGL ${Version.getVersion}!")
@@ -69,17 +84,31 @@ object Window {
     // creates the GLCapabilities instance and makes the OpenGL
     // bindings available for use.
     GL.createCapabilities()
+
+    changeScene(0)
   }
 
   def loop(): Unit = {
+    var beginTime = Time.time
+    var endTime = Time.time
+    var dt = -1.0f
+
     while (!glfwWindowShouldClose(glfwWindow.get)) {
       // Poll events
       glfwPollEvents()
 
-      glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
+      glClearColor(r, g, b, a)
       glClear(GL_COLOR_BUFFER_BIT)
 
+      if (dt >= 0) {
+        currentScene.update(dt)
+      }
+
       glfwSwapBuffers(glfwWindow.get)
+
+      endTime = Time.time
+      dt = endTime - beginTime
+      beginTime = endTime
     }
   }
 
