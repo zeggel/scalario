@@ -2,7 +2,7 @@ package jade
 
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
-import org.lwjgl.glfw.GLFW.{GLFW_FALSE, GLFW_MAXIMIZED, GLFW_RESIZABLE, GLFW_TRUE, GLFW_VISIBLE, glfwCreateWindow, glfwDefaultWindowHints, glfwDestroyWindow, glfwInit, glfwMakeContextCurrent, glfwPollEvents, glfwSetErrorCallback, glfwShowWindow, glfwSwapBuffers, glfwSwapInterval, glfwTerminate, glfwWindowHint, glfwWindowShouldClose}
+import org.lwjgl.glfw.GLFW.{GLFW_FALSE, GLFW_KEY_SPACE, GLFW_MAXIMIZED, GLFW_RESIZABLE, GLFW_TRUE, GLFW_VISIBLE, glfwCreateWindow, glfwDefaultWindowHints, glfwDestroyWindow, glfwInit, glfwMakeContextCurrent, glfwPollEvents, glfwSetCursorPosCallback, glfwSetErrorCallback, glfwSetKeyCallback, glfwSetMouseButtonCallback, glfwSetScrollCallback, glfwShowWindow, glfwSwapBuffers, glfwSwapInterval, glfwTerminate, glfwWindowHint, glfwWindowShouldClose}
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, glClear, glClearColor}
@@ -49,6 +49,11 @@ object Window {
     if (glfwWindow.isEmpty) {
       throw new IllegalStateException("Failed to create the GLFW window.")
     }
+
+    glfwSetCursorPosCallback(glfwWindow.get, MouseListener.mousePosCallback)
+    glfwSetMouseButtonCallback(glfwWindow.get, MouseListener.mouseButtonCallback)
+    glfwSetScrollCallback(glfwWindow.get, MouseListener.mouseScrollCallback)
+    glfwSetKeyCallback(glfwWindow.get, KeyListener.keyCallback)
 
     // Make the OpenGL context current
     glfwMakeContextCurrent(glfwWindow.get)
