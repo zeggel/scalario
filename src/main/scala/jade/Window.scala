@@ -12,7 +12,7 @@ object Window {
   val height = 480
   val title = "Mario"
 
-  var glfwWindow: java.lang.Long = null
+  var glfwWindow: Option[java.lang.Long] = None
 
   def run(): Unit = {
     println(s"Hello LWJGL ${Version.getVersion}!")
@@ -21,8 +21,8 @@ object Window {
     loop()
 
     // Free the memory
-    glfwFreeCallbacks(glfwWindow)
-    glfwDestroyWindow(glfwWindow)
+    glfwFreeCallbacks(glfwWindow.get)
+    glfwDestroyWindow(glfwWindow.get)
 
     // Terminate GLFW and the free the error callback
     glfwTerminate()
@@ -45,18 +45,18 @@ object Window {
     glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE)
 
     // Create the window
-    glfwWindow = glfwCreateWindow(width, height, title, null.asInstanceOf[java.lang.Long], null.asInstanceOf[java.lang.Long])
-    if (glfwWindow == null) {
+    glfwWindow = Option(glfwCreateWindow(width, height, title, null.asInstanceOf[java.lang.Long], null.asInstanceOf[java.lang.Long]))
+    if (glfwWindow.isEmpty) {
       throw new IllegalStateException("Failed to create the GLFW window.")
     }
 
     // Make the OpenGL context current
-    glfwMakeContextCurrent(glfwWindow)
+    glfwMakeContextCurrent(glfwWindow.get)
     // Enable v-sync
     glfwSwapInterval(1)
 
     // Make the window visible
-    glfwShowWindow(glfwWindow)
+    glfwShowWindow(glfwWindow.get)
 
     // This line is critical for LWJGL's interoperation with GLFW's
     // OpenGL context, or any context that is managed externally.
@@ -67,14 +67,14 @@ object Window {
   }
 
   def loop(): Unit = {
-    while (!glfwWindowShouldClose(glfwWindow)) {
+    while (!glfwWindowShouldClose(glfwWindow.get)) {
       // Poll events
       glfwPollEvents()
 
       glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
       glClear(GL_COLOR_BUFFER_BIT)
 
-      glfwSwapBuffers(glfwWindow)
+      glfwSwapBuffers(glfwWindow.get)
     }
   }
 
